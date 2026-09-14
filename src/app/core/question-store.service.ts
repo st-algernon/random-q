@@ -47,7 +47,6 @@ export class QuestionStore {
   readonly currentQuestionId = signal<string | null>(null);
   readonly revealedFollowUpCount = signal(0);
   readonly loadError = signal<string | null>(null);
-  readonly isCustomSet = signal(false);
 
   readonly availableTags = computed(() => {
     const tags = new Set<string>();
@@ -92,7 +91,6 @@ export class QuestionStore {
     const custom = readLocalStorage<RawQuestion[]>(CUSTOM_QUESTIONS_KEY);
     if (custom !== null) {
       this.allQuestions.set(normalize(custom));
-      this.isCustomSet.set(true);
     } else {
       this.loadDefaultQuestions();
     }
@@ -128,7 +126,6 @@ export class QuestionStore {
     });
     const merged = [...this.allQuestions(), ...withUniqueIds];
     this.allQuestions.set(merged);
-    this.isCustomSet.set(true);
     this.loadError.set(null);
     this.persistAsCustom(merged);
     return { ok: true, added: withUniqueIds.length };
@@ -143,7 +140,6 @@ export class QuestionStore {
     const question: Question = { ...normalized, id: uniqueId(normalized.id, existingIds) };
     const merged = [...this.allQuestions(), question];
     this.allQuestions.set(merged);
-    this.isCustomSet.set(true);
     this.persistAsCustom(merged);
     return { ok: true };
   }
@@ -220,7 +216,6 @@ export class QuestionStore {
       this.currentQuestionId.set(null);
       this.revealedFollowUpCount.set(0);
     }
-    this.isCustomSet.set(true);
     this.persistAsCustom(remaining);
   }
 
@@ -229,7 +224,6 @@ export class QuestionStore {
     this.answeredIds.set(new Set());
     this.currentQuestionId.set(null);
     this.revealedFollowUpCount.set(0);
-    this.isCustomSet.set(true);
     this.persistAsCustom([]);
   }
 }
