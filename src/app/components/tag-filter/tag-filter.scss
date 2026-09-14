@@ -1,0 +1,45 @@
+.tag-filter {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.tag-filter__label {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.tag-filter__list {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.tag {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+  border-radius: 2px;
+  transition: border-color 0.1s, color 0.1s;
+
+  &:hover {
+    border-color: var(--line-strong);
+    color: var(--fg);
+  }
+}
+
+.tag--active {
+  border-color: var(--line-strong);
+  color: var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+}
+
+.tag--clear {
+  border-style: dashed;
+}

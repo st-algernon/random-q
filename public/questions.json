@@ -1,0 +1,182 @@
+[
+  {
+    "id": "js-event-loop",
+    "text": "Як влаштований event loop у JavaScript?",
+    "tags": ["javascript", "general"],
+    "followUps": [
+      "У чому різниця між макро- та мікрозадачами (setTimeout vs Promise)?",
+      "Що станеться, якщо мікрозадача нескінченно додає нову мікрозадачу?",
+      "Як event loop у Node.js відрізняється від браузерного?"
+    ]
+  },
+  {
+    "id": "js-closures",
+    "text": "Що таке замикання (closure) і навіщо воно потрібне?",
+    "tags": ["javascript", "general"],
+    "followUps": [
+      "Наведіть приклад, де closure спричиняє витік пам'яті.",
+      "Як closure використовується для реалізації приватних змінних?"
+    ]
+  },
+  {
+    "id": "ts-generics",
+    "text": "Навіщо потрібні дженерики (generics) у TypeScript?",
+    "tags": ["typescript"],
+    "followUps": [
+      "Як обмежити дженерик певним типом (constraint)?",
+      "Чим дженерик-функція відрізняється від overload?"
+    ]
+  },
+  {
+    "id": "ts-structural-typing",
+    "text": "Що таке структурна типізація і чим вона відрізняється від номінальної?",
+    "tags": ["typescript"],
+    "followUps": [
+      "Як імітувати номінальну типізацію в TypeScript (branded types)?"
+    ]
+  },
+  {
+    "id": "ng-change-detection",
+    "text": "Як працює change detection в Angular?",
+    "tags": ["angular"],
+    "followUps": [
+      "У чому різниця між Default та OnPush стратегіями?",
+      "Як сигнали (signals) впливають на цикл change detection?",
+      "Що таке zone.js і чому Angular рухається до zoneless?"
+    ]
+  },
+  {
+    "id": "ng-di",
+    "text": "Як влаштована система Dependency Injection в Angular?",
+    "tags": ["angular"],
+    "followUps": [
+      "Чим відрізняються providedIn: 'root' та надання провайдера в модулі/компоненті?",
+      "Що таке ієрархія інжекторів і як вона впливає на видимість сервісів?"
+    ]
+  },
+  {
+    "id": "ng-rxjs-unsub",
+    "text": "Як правильно відписуватись від RxJS Observable в Angular-компоненті?",
+    "tags": ["angular", "rxjs"],
+    "followUps": [
+      "Чим async pipe кращий за ручну підписку?",
+      "Що таке takeUntilDestroyed і як він працює?"
+    ]
+  },
+  {
+    "id": "rxjs-hot-cold",
+    "text": "У чому різниця між hot та cold Observable?",
+    "tags": ["rxjs"],
+    "followUps": [
+      "Наведіть приклад перетворення cold Observable на hot.",
+      "Що таке Subject і чим він відрізняється від BehaviorSubject?"
+    ]
+  },
+  {
+    "id": "webapi-rest-idempotency",
+    "text": "Що таке ідемпотентність HTTP-методів і які методи є ідемпотентними?",
+    "tags": ["web-api", "http"],
+    "followUps": [
+      "Чи ідемпотентний POST? Чому?",
+      "Як забезпечити ідемпотентність нестандартної операції (наприклад, оплати)?"
+    ]
+  },
+  {
+    "id": "webapi-cors",
+    "text": "Що таке CORS і навіщо він потрібен?",
+    "tags": ["web-api", "http", "security"],
+    "followUps": [
+      "Чим simple request відрізняється від preflight-запиту?",
+      "Чи захищає CORS від CSRF? Чому так чи ні?"
+    ]
+  },
+  {
+    "id": "webapi-rest-vs-graphql",
+    "text": "Порівняйте REST та GraphQL. Коли б ви обрали кожен підхід?",
+    "tags": ["web-api"],
+    "followUps": [
+      "Як GraphQL вирішує проблему over-fetching / under-fetching?",
+      "Які недоліки має GraphQL порівняно з REST (кешування, складність)?"
+    ]
+  },
+  {
+    "id": "http-caching",
+    "text": "Як працює HTTP-кешування (Cache-Control, ETag)?",
+    "tags": ["web-api", "http", "performance"],
+    "followUps": [
+      "У чому різниця між strong та weak валідацією кешу?",
+      "Як браузер вирішує, чи використовувати кеш, чи ревалідовувати запит?"
+    ]
+  },
+  {
+    "id": "css-box-model",
+    "text": "Поясніть CSS box model.",
+    "tags": ["css"],
+    "followUps": [
+      "Чим box-sizing: border-box відрізняється від content-box?",
+      "Як margin collapse впливає на верстку?"
+    ]
+  },
+  {
+    "id": "css-specificity",
+    "text": "Як обчислюється специфічність (specificity) CSS-селекторів?",
+    "tags": ["css"],
+    "followUps": [
+      "Як !important впливає на каскад і чому його варто уникати?"
+    ]
+  },
+  {
+    "id": "perf-critical-rendering-path",
+    "text": "Що таке critical rendering path і як його оптимізувати?",
+    "tags": ["performance", "css"],
+    "followUps": [
+      "Що таке render-blocking ресурси і як їх усунути?",
+      "Як атрибути defer та async впливають на завантаження скриптів?"
+    ]
+  },
+  {
+    "id": "sd-cap-theorem",
+    "text": "Поясніть CAP-теорему.",
+    "tags": ["system-design"],
+    "followUps": [
+      "Наведіть приклад системи, що обирає CP, і системи, що обирає AP.",
+      "Чи можна взагалі повністю відмовитись від Partition tolerance?"
+    ]
+  },
+  {
+    "id": "sd-load-balancing",
+    "text": "Які існують стратегії балансування навантаження (load balancing)?",
+    "tags": ["system-design"],
+    "followUps": [
+      "У чому різниця між L4 та L7 балансуванням?",
+      "Як обробляти sticky sessions при горизонтальному масштабуванні?"
+    ]
+  },
+  {
+    "id": "general-algo-complexity",
+    "text": "Що таке асимптотична складність алгоритму (Big O)?",
+    "tags": ["general", "algorithms"],
+    "followUps": [
+      "Чим відрізняється O(n log n) від O(n^2) на практиці?",
+      "Наведіть приклад алгоритму зі складністю O(log n)."
+    ]
+  },
+  {
+    "id": "security-xss",
+    "text": "Що таке XSS-атака і як від неї захиститись?",
+    "tags": ["security", "web-api"],
+    "followUps": [
+      "Чим stored XSS відрізняється від reflected XSS?",
+      "Як Content-Security-Policy допомагає зменшити ризик XSS?"
+    ]
+  },
+  {
+    "id": "ng-forms",
+    "text": "Порівняйте Reactive Forms і Template-driven Forms в Angular.",
+    "tags": ["angular"],
+    "followUps": [
+      "Коли варто обирати Template-driven замість Reactive?",
+      "Як реалізувати кастомний валідатор для Reactive Form?"
+    ]
+  }
+]

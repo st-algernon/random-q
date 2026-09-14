@@ -1,0 +1,108 @@
+.card {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.card__tags {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.badge {
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.72rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card__question {
+  margin: 0;
+  font-size: 1.3rem;
+  line-height: 1.45;
+}
+
+.followups {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  border-left: 2px dashed var(--line);
+  padding: 0.25rem 0 0.25rem 1.25rem;
+}
+
+.followups__item {
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+.card__controls {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.btn {
+  border: 1px solid var(--line-strong);
+  background: none;
+  color: var(--fg);
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  border-radius: 2px;
+  transition: background 0.1s, color 0.1s;
+
+  &:hover {
+    background: var(--fg);
+    color: var(--bg);
+  }
+}
+
+.btn--primary {
+  background: var(--fg);
+  color: var(--bg);
+
+  &:hover {
+    opacity: 0.85;
+    background: var(--fg);
+    color: var(--bg);
+  }
+}
+
+.btn--ghost {
+  border-color: var(--line);
+  color: var(--muted);
+
+  &:hover {
+    border-color: var(--line-strong);
+    color: var(--fg);
+    background: none;
+  }
+}
+
+.empty {
+  border: 1px dashed var(--line);
+  padding: 2.5rem 2rem;
+  text-align: center;
+  color: var(--muted);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.empty__actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}

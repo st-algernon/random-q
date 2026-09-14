@@ -1,0 +1,56 @@
+:root {
+  --bg: #fafaf9;
+  --fg: #111111;
+  --muted: #6b6b6b;
+  --line: #cfcfcc;
+  --line-strong: #111111;
+  --surface: #ffffff;
+  --font-mono: ui-monospace, 'SFMono-Regular', 'JetBrains Mono', Menlo, Consolas,
+    'Liberation Mono', monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --fg: #ededec;
+    --muted: #8f8f8c;
+    --line: #3a3a38;
+    --line-strong: #ededec;
+    --surface: #191918;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-mono);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}

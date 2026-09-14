@@ -1,0 +1,62 @@
+@if (store.loadError() && store.totalCount() === 0) {
+  <div class="empty">
+    <p>{{ store.loadError() }}</p>
+  </div>
+} @else if (store.totalCount() === 0) {
+  <div class="empty">
+    <p>Завантаження питань…</p>
+  </div>
+} @else if (!store.currentQuestion() && store.filteredPool().length === 0) {
+  <div class="empty">
+    <p>Питань з обраними тегами не залишилось у пулі.</p>
+    <div class="empty__actions">
+      @if (store.selectedTags().size > 0) {
+        <button type="button" class="btn" (click)="store.clearTagFilter()">
+          скинути фільтр тегів
+        </button>
+      }
+      <button type="button" class="btn" (click)="store.resetAllAnswered()">
+        повернути всі питання в пул
+      </button>
+    </div>
+  </div>
+} @else if (!store.currentQuestion()) {
+  <div class="empty">
+    <button type="button" class="btn btn--primary" (click)="store.pickRandom()">
+      витягнути питання
+    </button>
+  </div>
+} @else {
+  <div class="card">
+    <div class="card__tags">
+      @for (tag of store.currentQuestion()!.tags; track tag) {
+        <span class="badge">{{ tag }}</span>
+      }
+    </div>
+
+    <p class="card__question">{{ store.currentQuestion()!.text }}</p>
+
+    @if (revealedFollowUps().length > 0) {
+      <ol class="followups">
+        @for (fu of revealedFollowUps(); track $index) {
+          <li class="followups__item">{{ fu }}</li>
+        }
+      </ol>
+    }
+
+    <div class="card__controls">
+      <button type="button" class="btn btn--ghost" (click)="store.pickRandom()">
+        ↻ інше питання
+      </button>
+      @if (hasMoreFollowUps()) {
+        <button type="button" class="btn btn--primary" (click)="store.revealNextFollowUp()">
+          + наступний follow-up
+        </button>
+      } @else {
+        <button type="button" class="btn btn--primary" (click)="store.markCurrentAnswered()">
+          ✓ відповів(-ла)
+        </button>
+      }
+    </div>
+  </div>
+}

@@ -1,0 +1,127 @@
+@if (open()) {
+  <div class="overlay" (click)="closeDialog()">
+    <div class="dialog" (click)="$event.stopPropagation()">
+      <div class="dialog__header">
+        <div class="dialog__tabs">
+          <button
+            type="button"
+            class="tab"
+            [class.tab--active]="mode() === 'manual'"
+            (click)="setMode('manual')"
+          >
+            нове питання
+          </button>
+          <button
+            type="button"
+            class="tab"
+            [class.tab--active]="mode() === 'import'"
+            (click)="setMode('import')"
+          >
+            імпорт json
+          </button>
+        </div>
+        <button type="button" class="close" title="закрити" (click)="closeDialog()">✕</button>
+      </div>
+
+      @if (mode() === 'manual') {
+        <form class="form" (ngSubmit)="submitManual()">
+          <label class="field">
+            <span class="field__label">питання *</span>
+            <textarea
+              class="field__input"
+              rows="2"
+              required
+              [ngModel]="text()"
+              (ngModelChange)="text.set($event)"
+              name="text"
+            ></textarea>
+          </label>
+
+          <label class="field">
+            <span class="field__label">теги (через кому)</span>
+            <input
+              type="text"
+              class="field__input"
+              placeholder="angular, web-api"
+              [ngModel]="tagsInput()"
+              (ngModelChange)="tagsInput.set($event)"
+              name="tags"
+            />
+          </label>
+
+          <div class="field">
+            <span class="field__label">follow-up питання</span>
+            <div class="followups">
+              @for (fu of followUps(); track $index) {
+                <div class="followups__row">
+                  <input
+                    type="text"
+                    class="field__input"
+                    [ngModel]="fu"
+                    (ngModelChange)="updateFollowUp($index, $event)"
+                    [name]="'followup-' + $index"
+                  />
+                  <button
+                    type="button"
+                    class="icon-btn"
+                    title="видалити"
+                    (click)="removeFollowUp($index)"
+                  >
+                    ✕
+                  </button>
+                </div>
+              }
+            </div>
+            <button type="button" class="link" (click)="addFollowUp()">+ follow-up</button>
+          </div>
+
+          @if (error()) {
+            <p class="msg msg--error">{{ error() }}</p>
+          }
+          @if (notice()) {
+            <p class="msg">{{ notice() }}</p>
+          }
+
+          <div class="dialog__actions">
+            <button type="submit" class="btn btn--primary">додати питання</button>
+          </div>
+        </form>
+      } @else {
+        <div class="import">
+          <p class="import__hint">
+            Оберіть JSON-файл з масивом питань — вони додадуться до вже наявних (існуючі не
+            видаляються). Очікувана структура:
+          </p>
+          <pre class="import__schema"><code>[
+  &#123;
+    "id": "унікальний-id",        // опційно
+    "text": "Текст питання",      // обов'язково
+    "tags": ["angular", "rxjs"],  // опційно
+    "followUps": [                // опційно
+      "Уточнююче питання 1",
+      "Уточнююче питання 2"
+    ]
+  &#125;
+]</code></pre>
+
+          <label class="btn btn--file">
+            обрати файл
+            <input
+              type="file"
+              accept="application/json,.json"
+              (change)="onFileSelected($event)"
+              hidden
+            />
+          </label>
+
+          @if (error()) {
+            <p class="msg msg--error">{{ error() }}</p>
+          }
+          @if (notice()) {
+            <p class="msg">{{ notice() }}</p>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

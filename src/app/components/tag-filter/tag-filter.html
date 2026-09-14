@@ -1,0 +1,22 @@
+@if (store.availableTags().length > 0) {
+  <div class="tag-filter">
+    <span class="tag-filter__label">теги</span>
+    <div class="tag-filter__list">
+      @for (tag of store.availableTags(); track tag) {
+        <button
+          type="button"
+          class="tag"
+          [class.tag--active]="store.selectedTags().has(tag)"
+          (click)="store.toggleTag(tag)"
+        >
+          {{ tag }}
+        </button>
+      }
+      @if (store.selectedTags().size > 0) {
+        <button type="button" class="tag tag--clear" (click)="store.clearTagFilter()">
+          ✕ скинути фільтр
+        </button>
+      }
+    </div>
+  </div>
+}

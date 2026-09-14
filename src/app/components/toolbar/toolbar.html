@@ -1,0 +1,11 @@
+<div class="toolbar">
+  <button type="button" class="btn" (click)="dialog.openDialog()">+ додати</button>
+  <span class="toolbar__stats">
+    {{ store.answeredCount() }} / {{ store.totalCount() }}
+    @if (store.isCustomSet()) {
+      <span class="toolbar__custom-flag">· свій набір</span>
+    }
+  </span>
+</div>
+
+<app-add-question-dialog #dialog />
