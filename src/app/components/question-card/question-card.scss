@@ -46,6 +46,7 @@
 
 .card__controls {
   display: flex;
+  justify-content: flex-end;
   gap: 0.6rem;
   flex-wrap: wrap;
   padding-top: 1rem;
