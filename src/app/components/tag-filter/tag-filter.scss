@@ -35,9 +35,14 @@
 
 .tag--active {
   border-color: var(--line-strong);
-  color: var(--fg);
   background: var(--fg);
   color: var(--bg);
+
+  &:hover {
+    border-color: var(--line-strong);
+    color: var(--bg);
+    opacity: 0.85;
+  }
 }
 
 .tag--clear {
