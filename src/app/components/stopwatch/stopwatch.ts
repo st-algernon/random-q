@@ -7,6 +7,7 @@ import {
   inject,
   input,
   signal,
+  untracked,
 } from '@angular/core';
 
 function formatElapsed(ms: number): string {
@@ -40,13 +41,16 @@ export class Stopwatch {
 
   constructor() {
     effect(() => {
-      if (this.questionId() !== null) {
-        this.resetInternal();
-        this.startInternal();
-      } else {
-        this.pauseInternal();
-        this.resetInternal();
-      }
+      const id = this.questionId();
+      untracked(() => {
+        if (id !== null) {
+          this.resetInternal();
+          this.startInternal();
+        } else {
+          this.pauseInternal();
+          this.resetInternal();
+        }
+      });
     });
 
     inject(DestroyRef).onDestroy(() => this.stopInterval());
