@@ -1,0 +1,12 @@
+<div class="stopwatch">
+  <span class="stopwatch__value">{{ label() }}</span>
+  <button
+    type="button"
+    class="stopwatch__btn"
+    [title]="running() ? 'пауза' : 'продовжити'"
+    (click)="toggle()"
+  >
+    {{ running() ? '⏸' : '▶' }}
+  </button>
+  <button type="button" class="stopwatch__btn" title="скинути таймер" (click)="reset()">↺</button>
+</div>

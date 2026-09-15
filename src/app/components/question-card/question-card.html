@@ -1,10 +1,14 @@
-@if (store.loadError() && store.totalCount() === 0) {
+@if (store.loading()) {
+  <div class="empty">
+    <p>Завантаження питань…</p>
+  </div>
+} @else if (store.loadError() && store.totalCount() === 0) {
   <div class="empty">
     <p>{{ store.loadError() }}</p>
   </div>
 } @else if (store.totalCount() === 0) {
   <div class="empty">
-    <p>Завантаження питань…</p>
+    <p>Питань немає. Додайте перше через "+ додати".</p>
   </div>
 } @else if (!store.currentQuestion() && store.filteredPool().length === 0) {
   <div class="empty">
@@ -28,10 +32,13 @@
   </div>
 } @else {
   <div class="card">
-    <div class="card__tags">
-      @for (tag of store.currentQuestion()!.tags; track tag) {
-        <span class="badge">{{ tag }}</span>
-      }
+    <div class="card__header">
+      <div class="card__tags">
+        @for (tag of store.currentQuestion()!.tags; track tag) {
+          <span class="badge">{{ tag }}</span>
+        }
+      </div>
+      <app-stopwatch [questionId]="store.currentQuestion()!.id" />
     </div>
 
     <p class="card__question">{{ store.currentQuestion()!.text }}</p>

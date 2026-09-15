@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { QuestionStore } from '../../core/question-store.service';
+import { Stopwatch } from '../stopwatch/stopwatch';
 
 @Component({
   selector: 'app-question-card',
+  imports: [Stopwatch],
   templateUrl: './question-card.html',
   styleUrl: './question-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

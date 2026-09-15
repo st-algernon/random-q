@@ -47,6 +47,7 @@ export class QuestionStore {
   readonly currentQuestionId = signal<string | null>(null);
   readonly revealedFollowUpCount = signal(0);
   readonly loadError = signal<string | null>(null);
+  readonly loading = signal(true);
 
   readonly availableTags = computed(() => {
     const tags = new Set<string>();
@@ -91,6 +92,7 @@ export class QuestionStore {
     const custom = readLocalStorage<RawQuestion[]>(CUSTOM_QUESTIONS_KEY);
     if (custom !== null) {
       this.allQuestions.set(normalize(custom));
+      this.loading.set(false);
     } else {
       this.loadDefaultQuestions();
     }
@@ -106,6 +108,8 @@ export class QuestionStore {
       this.loadError.set(
         'Не вдалось завантажити questions.json. Імпортуйте свій файл.',
       );
+    } finally {
+      this.loading.set(false);
     }
   }
 
