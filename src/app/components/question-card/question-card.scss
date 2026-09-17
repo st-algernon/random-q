@@ -53,6 +53,18 @@
   font-size: 1rem;
 }
 
+.segment-time {
+  display: inline-block;
+  margin-left: 0.5rem;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  padding: 0.05rem 0.35rem;
+  vertical-align: middle;
+}
+
 .card__controls {
   display: flex;
   justify-content: flex-end;

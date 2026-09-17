@@ -10,7 +10,7 @@ import {
   untracked,
 } from '@angular/core';
 
-function formatElapsed(ms: number): string {
+export function formatElapsed(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
@@ -33,11 +33,14 @@ export class Stopwatch {
   private startedAt: number | null = null;
   private intervalId: ReturnType<typeof setInterval> | null = null;
 
-  protected readonly label = computed(() => {
+  /** Public so hosts can snapshot the running total at a segment boundary (e.g. revealing a follow-up). */
+  readonly elapsedMs = computed(() => {
     this.tick();
     const live = this.running() && this.startedAt !== null ? Date.now() - this.startedAt : 0;
-    return formatElapsed(this.accumulatedMs + live);
+    return this.accumulatedMs + live;
   });
+
+  protected readonly label = computed(() => formatElapsed(this.elapsedMs()));
 
   constructor() {
     effect(() => {
@@ -62,6 +65,11 @@ export class Stopwatch {
     } else if (this.questionId() !== null) {
       this.startInternal();
     }
+  }
+
+  /** Public so a host can stop the count once the question is fully answered. */
+  pause(): void {
+    this.pauseInternal();
   }
 
   protected reset(): void {

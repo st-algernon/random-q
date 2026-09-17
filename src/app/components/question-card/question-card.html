@@ -38,15 +38,25 @@
           <span class="badge">{{ tag }}</span>
         }
       </div>
-      <app-stopwatch [questionId]="store.currentQuestion()!.id" />
+      <app-stopwatch #stopwatch [questionId]="store.currentQuestion()!.id" />
     </div>
 
-    <p class="card__question">{{ store.currentQuestion()!.text }}</p>
+    <p class="card__question">
+      {{ store.currentQuestion()!.text }}
+      @if (segmentLabel(0); as dur) {
+        <span class="segment-time">{{ dur }}</span>
+      }
+    </p>
 
     @if (revealedFollowUps().length > 0) {
       <ol class="followups">
         @for (fu of revealedFollowUps(); track $index) {
-          <li class="followups__item">{{ fu }}</li>
+          <li class="followups__item">
+            {{ fu }}
+            @if (segmentLabel($index + 1); as dur) {
+              <span class="segment-time">{{ dur }}</span>
+            }
+          </li>
         }
       </ol>
     }
@@ -56,12 +66,16 @@
         ↻ інше питання
       </button>
       @if (hasMoreFollowUps()) {
-        <button type="button" class="btn btn--primary" (click)="store.revealNextFollowUp()">
+        <button
+          type="button"
+          class="btn btn--primary"
+          (click)="advanceFollowUp(stopwatch.elapsedMs())"
+        >
           + наступний follow-up
         </button>
       } @else {
-        <button type="button" class="btn btn--primary" (click)="store.markCurrentAnswered()">
-          ✓ відповів(-ла)
+        <button type="button" class="btn btn--primary" (click)="requestFinish(stopwatch)">
+          {{ awaitingNext() ? '→ наступне питання' : '✓ відповів(-ла)' }}
         </button>
       }
     </div>
