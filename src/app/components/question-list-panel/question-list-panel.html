@@ -16,21 +16,117 @@
     >
       усі питання ({{ store.totalCount() }})
     </button>
+    <button
+      type="button"
+      class="tab"
+      [class.tab--active]="activeTab() === 'archived'"
+      (click)="activeTab.set('archived')"
+    >
+      архів ({{ store.archivedCount() }})
+    </button>
   </div>
 
-  @if (activeTab() === 'answered') {
-    @if (store.answeredQuestions().length > 0) {
-      <div class="panel__action-row">
-        <button type="button" class="link" (click)="store.resetAllAnswered()">
-          скинути все
-        </button>
+  @if (
+    store.availableTags().length > 0 ||
+    (activeTab() === 'answered' && filteredAnswered().length > 0) ||
+    (activeTab() === 'all' && filteredAll().length > 0)
+  ) {
+    <div class="panel__action-row">
+      <div class="panel__action-row-left">
+        @if (store.availableTags().length > 0) {
+          <select class="tag-select" (change)="onTagChange($event)">
+            <option value="" [selected]="selectedTag() === ''">усі теги</option>
+            @for (tag of store.availableTags(); track tag) {
+              <option [value]="tag" [selected]="selectedTag() === tag">{{ tag }}</option>
+            }
+          </select>
+        }
       </div>
-    }
-    @if (store.answeredQuestions().length === 0) {
+      <div class="panel__action-row-right">
+        @if (activeTab() === 'answered' && filteredAnswered().length > 0) {
+          <button type="button" class="link" (click)="archiveAllAnswered()">
+            архівувати все
+          </button>
+          <button type="button" class="link" (click)="resetAllAnswered()">скинути все</button>
+        } @else if (activeTab() === 'all' && filteredAll().length > 0) {
+          <button type="button" class="link" (click)="deleteAll()">видалити все</button>
+        }
+      </div>
+    </div>
+  }
+
+  @if (activeTab() === 'answered') {
+    @if (filteredAnswered().length === 0) {
       <p class="panel__empty">поки що порожньо</p>
     } @else {
       <ul class="panel__list">
-        @for (q of store.answeredQuestions(); track q.id) {
+        @for (q of filteredAnswered(); track q.id) {
+          <li class="panel__item">
+            <div class="panel__text">
+              <span class="panel__question">{{ q.text }}</span>
+              <span class="panel__tags">
+                @for (tag of q.tags; track tag) {
+                  <span class="badge-mini">{{ tag }}</span>
+                }
+              </span>
+            </div>
+            <div class="panel__item-actions">
+              <button
+                type="button"
+                class="link"
+                title="архівувати питання"
+                (click)="store.archiveQuestion(q.id)"
+              >
+                ⤓ архівувати
+              </button>
+              <button
+                type="button"
+                class="link"
+                title="повернути в пул"
+                (click)="store.returnToPool(q.id)"
+              >
+                ↺ повернути
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+    }
+  } @else if (activeTab() === 'all') {
+    @if (filteredAll().length === 0) {
+      <p class="panel__empty">немає питань</p>
+    } @else {
+      <ul class="panel__list">
+        @for (q of filteredAll(); track q.id) {
+          <li class="panel__item">
+            <div class="panel__text">
+              <span class="panel__question" [class.panel__question--done]="store.isAnswered(q.id)">
+                {{ q.text }}
+              </span>
+              <span class="panel__tags">
+                @for (tag of q.tags; track tag) {
+                  <span class="badge-mini">{{ tag }}</span>
+                }
+              </span>
+            </div>
+            <button
+              type="button"
+              class="link"
+              title="видалити питання"
+              (click)="deleteQuestion(q.id, q.text)"
+            >
+              ✕ видалити
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  } @else {
+    @if (filteredArchived().length === 0) {
+      <p class="panel__empty">архів порожній</p>
+    } @else {
+      <ul class="panel__list">
+        @for (q of filteredArchived(); track q.id) {
           <li class="panel__item">
             <div class="panel__text">
               <span class="panel__question">{{ q.text }}</span>
@@ -43,49 +139,10 @@
             <button
               type="button"
               class="link"
-              title="повернути в пул"
-              (click)="store.returnToPool(q.id)"
+              title="повернути з архіву"
+              (click)="store.restoreFromArchive(q.id)"
             >
               ↺ повернути
-            </button>
-          </li>
-        }
-      </ul>
-    }
-  } @else {
-    @if (store.allQuestionsList().length > 0) {
-      <div class="panel__action-row">
-        <button type="button" class="link" (click)="deleteAll()">
-          видалити все
-        </button>
-      </div>
-    }
-    @if (store.allQuestionsList().length === 0) {
-      <p class="panel__empty">немає питань</p>
-    } @else {
-      <ul class="panel__list">
-        @for (q of store.allQuestionsList(); track q.id) {
-          <li class="panel__item">
-            <div class="panel__text">
-              <span class="panel__question" [class.panel__question--done]="store.isAnswered(q.id)">
-                {{ q.text }}
-              </span>
-              <span class="panel__tags">
-                @for (tag of q.tags; track tag) {
-                  <span class="badge-mini">{{ tag }}</span>
-                }
-                @if (store.isAnswered(q.id)) {
-                  <span class="badge-mini badge-mini--done">відповідано</span>
-                }
-              </span>
-            </div>
-            <button
-              type="button"
-              class="link"
-              title="видалити питання"
-              (click)="deleteQuestion(q.id, q.text)"
-            >
-              ✕ видалити
             </button>
           </li>
         }

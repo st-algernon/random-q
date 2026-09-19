@@ -2,6 +2,7 @@ import { Injectable, computed, effect, signal } from '@angular/core';
 import { Question, RawQuestion } from './question.model';
 
 const ANSWERED_KEY = 'randomq.answeredIds';
+const ARCHIVED_KEY = 'randomq.archivedIds';
 const CUSTOM_QUESTIONS_KEY = 'randomq.customQuestions';
 
 function readLocalStorage<T>(key: string): T | null {
@@ -43,6 +44,9 @@ export class QuestionStore {
   private readonly answeredIds = signal<Set<string>>(
     new Set(readLocalStorage<string[]>(ANSWERED_KEY) ?? []),
   );
+  private readonly archivedIds = signal<Set<string>>(
+    new Set(readLocalStorage<string[]>(ARCHIVED_KEY) ?? []),
+  );
   readonly selectedTags = signal<Set<string>>(new Set());
   readonly currentQuestionId = signal<string | null>(null);
   readonly revealedFollowUpCount = signal(0);
@@ -60,9 +64,11 @@ export class QuestionStore {
   readonly filteredPool = computed(() => {
     const selected = this.selectedTags();
     const answered = this.answeredIds();
+    const archived = this.archivedIds();
     return this.allQuestions().filter(
       (q) =>
         !answered.has(q.id) &&
+        !archived.has(q.id) &&
         (selected.size === 0 || q.tags.some((t) => selected.has(t))),
     );
   });
@@ -71,6 +77,13 @@ export class QuestionStore {
     const answered = this.answeredIds();
     return this.allQuestions()
       .filter((q) => answered.has(q.id))
+      .reverse();
+  });
+
+  readonly archivedQuestions = computed(() => {
+    const archived = this.archivedIds();
+    return this.allQuestions()
+      .filter((q) => archived.has(q.id))
       .reverse();
   });
 
@@ -83,10 +96,14 @@ export class QuestionStore {
   readonly allQuestionsList = computed(() => this.allQuestions());
   readonly totalCount = computed(() => this.allQuestions().length);
   readonly answeredCount = computed(() => this.answeredIds().size);
+  readonly archivedCount = computed(() => this.archivedIds().size);
 
   constructor() {
     effect(() => {
       writeLocalStorage(ANSWERED_KEY, [...this.answeredIds()]);
+    });
+    effect(() => {
+      writeLocalStorage(ARCHIVED_KEY, [...this.archivedIds()]);
     });
 
     const custom = readLocalStorage<RawQuestion[]>(CUSTOM_QUESTIONS_KEY);
@@ -206,11 +223,39 @@ export class QuestionStore {
     return this.answeredIds().has(id);
   }
 
+  isArchived(id: string): boolean {
+    return this.archivedIds().has(id);
+  }
+
+  archiveQuestion(id: string): void {
+    if (!this.answeredIds().has(id)) return;
+    this.archivedIds.update((set) => new Set(set).add(id));
+    if (this.currentQuestionId() === id) {
+      this.currentQuestionId.set(null);
+      this.revealedFollowUpCount.set(0);
+    }
+  }
+
+  restoreFromArchive(id: string): void {
+    this.archivedIds.update((set) => {
+      const next = new Set(set);
+      next.delete(id);
+      return next;
+    });
+  }
+
   deleteQuestion(id: string): void {
     const remaining = this.allQuestions().filter((q) => q.id !== id);
     this.allQuestions.set(remaining);
     if (this.answeredIds().has(id)) {
       this.answeredIds.update((set) => {
+        const next = new Set(set);
+        next.delete(id);
+        return next;
+      });
+    }
+    if (this.archivedIds().has(id)) {
+      this.archivedIds.update((set) => {
         const next = new Set(set);
         next.delete(id);
         return next;
@@ -226,6 +271,7 @@ export class QuestionStore {
   deleteAllQuestions(): void {
     this.allQuestions.set([]);
     this.answeredIds.set(new Set());
+    this.archivedIds.set(new Set());
     this.currentQuestionId.set(null);
     this.revealedFollowUpCount.set(0);
     this.persistAsCustom([]);

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "mock-closures",
+    "text": "[mock] Що таке замикання (closure) в JavaScript?",
+    "tags": ["javascript", "general", "mock"],
+    "followUps": ["Наведіть приклад витоку пам'яті через closure."]
+  },
+  {
+    "id": "mock-generics",
+    "text": "[mock] Навіщо потрібні дженерики в TypeScript?",
+    "tags": ["typescript", "mock"],
+    "followUps": []
+  },
+  {
+    "id": "mock-change-detection",
+    "text": "[mock] Як працює change detection в Angular?",
+    "tags": ["angular", "mock"],
+    "followUps": ["Чим OnPush відрізняється від Default?", "Що таке zoneless Angular?"]
+  },
+  {
+    "id": "mock-cors",
+    "text": "[mock] Що таке CORS?",
+    "tags": ["web-api", "http", "mock"],
+    "followUps": []
+  },
+  {
+    "id": "mock-box-model",
+    "text": "[mock] Поясніть CSS box model.",
+    "tags": ["css", "mock"],
+    "followUps": ["Чим border-box відрізняється від content-box?"]
+  }
+]
