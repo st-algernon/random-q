@@ -75,8 +75,9 @@ export class QuestionStore {
 
   readonly answeredQuestions = computed(() => {
     const answered = this.answeredIds();
+    const archived = this.archivedIds();
     return this.allQuestions()
-      .filter((q) => answered.has(q.id))
+      .filter((q) => answered.has(q.id) && !archived.has(q.id))
       .reverse();
   });
 
