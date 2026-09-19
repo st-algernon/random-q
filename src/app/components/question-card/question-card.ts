@@ -50,15 +50,20 @@ export class QuestionCard {
     this.store.revealNextFollowUp();
   }
 
-  /** First click freezes the last segment's time and stops the clock; second click actually moves on. */
+  /**
+   * First click marks the question answered right away and freezes/stops the clock so the last
+   * segment's time stays visible; second click just moves on to a new question.
+   */
   protected requestFinish(stopwatch: Stopwatch): void {
     if (!this.awaitingNext()) {
       this.recordSegment(stopwatch.elapsedMs());
       stopwatch.pause();
+      const id = this.store.currentQuestion()?.id;
+      if (id) this.store.markAnswered(id);
       this.awaitingNext.set(true);
       return;
     }
-    this.store.markCurrentAnswered();
+    this.store.advanceToNextQuestion();
   }
 
   private recordSegment(totalElapsedMs: number): void {

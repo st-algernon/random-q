@@ -69,11 +69,11 @@ export class AddQuestionDialog {
     };
     const result = this.store.addQuestion(raw);
     if (!result.ok) {
-      this.error.set(result.error ?? 'Не вдалось додати питання.');
+      this.error.set(result.error ?? 'Could not add the question.');
       return;
     }
     this.error.set(null);
-    this.notice.set('✓ додано');
+    this.notice.set('✓ added');
     this.text.set('');
     this.tagsInput.set('');
     this.followUps.set([]);
@@ -89,14 +89,14 @@ export class AddQuestionDialog {
       const raw = JSON.parse(text) as RawQuestion[];
       const result = this.store.importFromRaw(raw);
       if (!result.ok) {
-        this.error.set(result.error ?? 'Помилка імпорту.');
+        this.error.set(result.error ?? 'Import failed.');
         return;
       }
       this.error.set(null);
-      this.notice.set(`✓ додано питань: ${result.added}`);
+      this.notice.set(`✓ added ${result.added} question(s)`);
       setTimeout(() => this.closeDialog(), 700);
     } catch {
-      this.error.set('Некоректний JSON-файл.');
+      this.error.set('Invalid JSON file.');
     } finally {
       input.value = '';
     }

@@ -3,65 +3,110 @@
     <button
       type="button"
       class="tab"
-      [class.tab--active]="activeTab() === 'answered'"
-      (click)="activeTab.set('answered')"
+      [class.tab--active]="activeTab() === 'pending'"
+      (click)="setTab('pending')"
     >
-      відповідано ({{ store.answeredQuestions().length }})
+      queue ({{ store.pendingQuestions().length }})
     </button>
     <button
       type="button"
       class="tab"
-      [class.tab--active]="activeTab() === 'all'"
-      (click)="activeTab.set('all')"
+      [class.tab--active]="activeTab() === 'answered'"
+      (click)="setTab('answered')"
     >
-      усі питання ({{ store.totalCount() }})
+      answered ({{ store.answeredQuestions().length }})
     </button>
     <button
       type="button"
       class="tab"
       [class.tab--active]="activeTab() === 'archived'"
-      (click)="activeTab.set('archived')"
+      (click)="setTab('archived')"
     >
-      архів ({{ store.archivedCount() }})
+      archive ({{ store.archivedCount() }})
     </button>
   </div>
 
-  @if (
-    store.availableTags().length > 0 ||
-    (activeTab() === 'answered' && filteredAnswered().length > 0) ||
-    (activeTab() === 'all' && filteredAll().length > 0)
-  ) {
-    <div class="panel__action-row">
-      <div class="panel__action-row-left">
-        @if (store.availableTags().length > 0) {
-          <select class="tag-select" (change)="onTagChange($event)">
-            <option value="" [selected]="selectedTag() === ''">усі теги</option>
-            @for (tag of store.availableTags(); track tag) {
-              <option [value]="tag" [selected]="selectedTag() === tag">{{ tag }}</option>
-            }
-          </select>
-        }
-      </div>
-      <div class="panel__action-row-right">
-        @if (activeTab() === 'answered' && filteredAnswered().length > 0) {
-          <button type="button" class="link" (click)="archiveAllAnswered()">
-            архівувати все
+  @if (currentList().length > 0 || store.availableTags().length > 0) {
+    <div class="panel__toolbar">
+      @if (store.availableTags().length > 0) {
+        <select class="tag-select" (change)="onTagChange($event)">
+          <option value="" [selected]="selectedTag() === ''">all tags</option>
+          @for (tag of store.availableTags(); track tag) {
+            <option [value]="tag" [selected]="selectedTag() === tag">{{ tag }}</option>
+          }
+        </select>
+      }
+      <div class="panel__toolbar-actions">
+        @if (activeTab() === 'pending') {
+          <button
+            type="button"
+            class="link"
+            [disabled]="selectedIds().size === 0"
+            (click)="deleteSelected()"
+          >
+            ✕ delete
           </button>
-          <button type="button" class="link" (click)="resetAllAnswered()">скинути все</button>
-        } @else if (activeTab() === 'all' && filteredAll().length > 0) {
-          <button type="button" class="link" (click)="deleteAll()">видалити все</button>
+        } @else if (activeTab() === 'answered') {
+          <button
+            type="button"
+            class="link"
+            [disabled]="selectedIds().size === 0"
+            (click)="archiveSelected()"
+          >
+            ⤓ archive
+          </button>
+          <button
+            type="button"
+            class="link"
+            [disabled]="selectedIds().size === 0"
+            (click)="resetSelected()"
+          >
+            ↺ reset
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="link"
+            [disabled]="selectedIds().size === 0"
+            (click)="restoreSelected()"
+          >
+            ↺ restore
+          </button>
         }
       </div>
     </div>
   }
 
-  @if (activeTab() === 'answered') {
-    @if (filteredAnswered().length === 0) {
-      <p class="panel__empty">поки що порожньо</p>
+  @if (currentList().length > 0) {
+    <div class="panel__select-row">
+      <label class="select-all-label">
+        <input
+          type="checkbox"
+          class="select-all"
+          [checked]="allSelected()"
+          (change)="toggleSelectAll()"
+        />
+        Select all
+      </label>
+      @if (selectedIds().size > 0) {
+        <span class="selected-count">{{ selectedIds().size }} selected</span>
+      }
+    </div>
+  }
+
+  @if (activeTab() === 'pending') {
+    @if (filteredPending().length === 0) {
+      <p class="panel__empty">queue is empty</p>
     } @else {
       <ul class="panel__list">
-        @for (q of filteredAnswered(); track q.id) {
+        @for (q of filteredPending(); track q.id) {
           <li class="panel__item">
+            <input
+              type="checkbox"
+              class="item-checkbox"
+              [checked]="selectedIds().has(q.id)"
+              (change)="toggleSelect(q.id)"
+            />
             <div class="panel__text">
               <span class="panel__question">{{ q.text }}</span>
               <span class="panel__tags">
@@ -70,64 +115,48 @@
                 }
               </span>
             </div>
-            <div class="panel__item-actions">
-              <button
-                type="button"
-                class="link"
-                title="архівувати питання"
-                (click)="store.archiveQuestion(q.id)"
-              >
-                ⤓ архівувати
-              </button>
-              <button
-                type="button"
-                class="link"
-                title="повернути в пул"
-                (click)="store.returnToPool(q.id)"
-              >
-                ↺ повернути
-              </button>
-            </div>
           </li>
         }
       </ul>
     }
-  } @else if (activeTab() === 'all') {
-    @if (filteredAll().length === 0) {
-      <p class="panel__empty">немає питань</p>
+  } @else if (activeTab() === 'answered') {
+    @if (filteredAnswered().length === 0) {
+      <p class="panel__empty">nothing here yet</p>
     } @else {
       <ul class="panel__list">
-        @for (q of filteredAll(); track q.id) {
+        @for (q of filteredAnswered(); track q.id) {
           <li class="panel__item">
+            <input
+              type="checkbox"
+              class="item-checkbox"
+              [checked]="selectedIds().has(q.id)"
+              (change)="toggleSelect(q.id)"
+            />
             <div class="panel__text">
-              <span class="panel__question" [class.panel__question--done]="store.isAnswered(q.id)">
-                {{ q.text }}
-              </span>
+              <span class="panel__question">{{ q.text }}</span>
               <span class="panel__tags">
                 @for (tag of q.tags; track tag) {
                   <span class="badge-mini">{{ tag }}</span>
                 }
               </span>
             </div>
-            <button
-              type="button"
-              class="link"
-              title="видалити питання"
-              (click)="deleteQuestion(q.id, q.text)"
-            >
-              ✕ видалити
-            </button>
           </li>
         }
       </ul>
     }
   } @else {
     @if (filteredArchived().length === 0) {
-      <p class="panel__empty">архів порожній</p>
+      <p class="panel__empty">archive is empty</p>
     } @else {
       <ul class="panel__list">
         @for (q of filteredArchived(); track q.id) {
           <li class="panel__item">
+            <input
+              type="checkbox"
+              class="item-checkbox"
+              [checked]="selectedIds().has(q.id)"
+              (change)="toggleSelect(q.id)"
+            />
             <div class="panel__text">
               <span class="panel__question">{{ q.text }}</span>
               <span class="panel__tags">
@@ -136,14 +165,6 @@
                 }
               </span>
             </div>
-            <button
-              type="button"
-              class="link"
-              title="повернути з архіву"
-              (click)="store.restoreFromArchive(q.id)"
-            >
-              ↺ повернути
-            </button>
           </li>
         }
       </ul>

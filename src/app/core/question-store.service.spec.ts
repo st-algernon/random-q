@@ -37,6 +37,21 @@ describe('QuestionStore', () => {
     expect(store.archivedCount()).toBe(0);
   });
 
+  it('pendingQuestions excludes both answered and archived questions', () => {
+    const [first, second] = mockQuestions;
+    store.currentQuestionId.set(first.id);
+    store.markCurrentAnswered();
+    store.archiveQuestion(first.id);
+
+    store.currentQuestionId.set(second.id);
+    store.markCurrentAnswered();
+
+    const pendingIds = store.pendingQuestions().map((q) => q.id);
+    expect(pendingIds).not.toContain(first.id);
+    expect(pendingIds).not.toContain(second.id);
+    expect(pendingIds.length).toBe(mockQuestions.length - 2);
+  });
+
   it('archives an answered question and excludes it from the random pool', () => {
     const [first] = mockQuestions;
     store.currentQuestionId.set(first.id);
@@ -70,18 +85,6 @@ describe('QuestionStore', () => {
     expect(store.totalCount()).toBe(mockQuestions.length - 1);
     expect(store.answeredQuestions().some((q) => q.id === first.id)).toBe(false);
     expect(store.archivedQuestions().some((q) => q.id === first.id)).toBe(false);
-  });
-
-  it('deleteAllQuestions clears the pool and all status sets', () => {
-    const [first] = mockQuestions;
-    store.currentQuestionId.set(first.id);
-    store.markCurrentAnswered();
-
-    store.deleteAllQuestions();
-
-    expect(store.totalCount()).toBe(0);
-    expect(store.answeredCount()).toBe(0);
-    expect(store.archivedCount()).toBe(0);
   });
 
   it('importFromRaw merges new questions instead of replacing the pool', () => {

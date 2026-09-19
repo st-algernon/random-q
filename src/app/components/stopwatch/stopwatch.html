@@ -3,10 +3,10 @@
   <button
     type="button"
     class="stopwatch__btn"
-    [title]="running() ? 'пауза' : 'продовжити'"
+    [title]="running() ? 'pause' : 'resume'"
     (click)="toggle()"
   >
     {{ running() ? '⏸' : '▶' }}
   </button>
-  <button type="button" class="stopwatch__btn" title="скинути таймер" (click)="reset()">↺</button>
+  <button type="button" class="stopwatch__btn" title="reset timer" (click)="reset()">↺</button>
 </div>

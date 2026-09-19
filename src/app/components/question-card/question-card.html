@@ -1,6 +1,6 @@
 @if (store.loading()) {
   <div class="empty">
-    <p>Завантаження питань…</p>
+    <p>Loading questions…</p>
   </div>
 } @else if (store.loadError() && store.totalCount() === 0) {
   <div class="empty">
@@ -8,26 +8,26 @@
   </div>
 } @else if (store.totalCount() === 0) {
   <div class="empty">
-    <p>Питань немає. Додайте перше через "+ додати".</p>
+    <p>No questions yet. Add one via "+ add".</p>
   </div>
 } @else if (!store.currentQuestion() && store.filteredPool().length === 0) {
   <div class="empty">
-    <p>Питань з обраними тегами не залишилось у пулі.</p>
+    <p>No questions left in the queue for the selected tags.</p>
     <div class="empty__actions">
       @if (store.selectedTags().size > 0) {
         <button type="button" class="btn" (click)="store.clearTagFilter()">
-          скинути фільтр тегів
+          ✕ clear tag filter
         </button>
       }
       <button type="button" class="btn" (click)="store.resetAllAnswered()">
-        повернути всі питання в пул
+        ↺ return all questions to the queue
       </button>
     </div>
   </div>
 } @else if (!store.currentQuestion()) {
   <div class="empty">
     <button type="button" class="btn btn--primary" (click)="store.pickRandom()">
-      витягнути питання
+      ↻ draw a question
     </button>
   </div>
 } @else {
@@ -63,7 +63,7 @@
 
     <div class="card__controls">
       <button type="button" class="btn btn--ghost" (click)="store.pickRandom()">
-        ↻ інше питання
+        ↻ another question
       </button>
       @if (hasMoreFollowUps()) {
         <button
@@ -71,11 +71,11 @@
           class="btn btn--primary"
           (click)="advanceFollowUp(stopwatch.elapsedMs())"
         >
-          + наступний follow-up
+          + next follow-up
         </button>
       } @else {
         <button type="button" class="btn btn--primary" (click)="requestFinish(stopwatch)">
-          {{ awaitingNext() ? '→ наступне питання' : '✓ відповів(-ла)' }}
+          {{ awaitingNext() ? '→ next question' : '✓ answered' }}
         </button>
       }
     </div>

@@ -1,6 +1,6 @@
 @if (store.availableTags().length > 0) {
   <div class="tag-filter">
-    <span class="tag-filter__label">теги</span>
+    <span class="tag-filter__label">tags</span>
     <div class="tag-filter__list">
       @for (tag of store.availableTags(); track tag) {
         <button
@@ -14,7 +14,7 @@
       }
       @if (store.selectedTags().size > 0) {
         <button type="button" class="tag tag--clear" (click)="store.clearTagFilter()">
-          ✕ скинути фільтр
+          ✕ clear filter
         </button>
       }
     </div>

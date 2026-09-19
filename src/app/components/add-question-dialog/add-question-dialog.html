@@ -9,7 +9,7 @@
             [class.tab--active]="mode() === 'manual'"
             (click)="setMode('manual')"
           >
-            нове питання
+            new question
           </button>
           <button
             type="button"
@@ -17,16 +17,16 @@
             [class.tab--active]="mode() === 'import'"
             (click)="setMode('import')"
           >
-            імпорт json
+            import json
           </button>
         </div>
-        <button type="button" class="close" title="закрити" (click)="closeDialog()">✕</button>
+        <button type="button" class="close" title="close" (click)="closeDialog()">✕</button>
       </div>
 
       @if (mode() === 'manual') {
         <form class="form" (ngSubmit)="submitManual()">
           <label class="field">
-            <span class="field__label">питання *</span>
+            <span class="field__label">question *</span>
             <textarea
               class="field__input"
               rows="2"
@@ -38,7 +38,7 @@
           </label>
 
           <label class="field">
-            <span class="field__label">теги (через кому)</span>
+            <span class="field__label">tags (comma-separated)</span>
             <input
               type="text"
               class="field__input"
@@ -50,7 +50,7 @@
           </label>
 
           <div class="field">
-            <span class="field__label">follow-up питання</span>
+            <span class="field__label">follow-up questions</span>
             <div class="followups">
               @for (fu of followUps(); track $index) {
                 <div class="followups__row">
@@ -64,7 +64,7 @@
                   <button
                     type="button"
                     class="icon-btn"
-                    title="видалити"
+                    title="remove"
                     (click)="removeFollowUp($index)"
                   >
                     ✕
@@ -83,29 +83,29 @@
           }
 
           <div class="dialog__actions">
-            <button type="submit" class="btn btn--primary">додати питання</button>
+            <button type="submit" class="btn btn--primary">+ add question</button>
           </div>
         </form>
       } @else {
         <div class="import">
           <p class="import__hint">
-            Оберіть JSON-файл з масивом питань — вони додадуться до вже наявних (існуючі не
-            видаляються). Очікувана структура:
+            Choose a JSON file with an array of questions — they'll be added to the existing
+            ones (nothing gets removed). Expected structure:
           </p>
           <pre class="import__schema"><code>[
   &#123;
-    "id": "унікальний-id",        // опційно
-    "text": "Текст питання",      // обов'язково
-    "tags": ["angular", "rxjs"],  // опційно
-    "followUps": [                // опційно
-      "Уточнююче питання 1",
-      "Уточнююче питання 2"
+    "id": "unique-id",           // optional
+    "text": "Question text",     // required
+    "tags": ["angular", "rxjs"], // optional
+    "followUps": [               // optional
+      "Follow-up question 1",
+      "Follow-up question 2"
     ]
   &#125;
 ]</code></pre>
 
           <label class="btn btn--file">
-            обрати файл
+            ⤒ choose file
             <input
               type="file"
               accept="application/json,.json"

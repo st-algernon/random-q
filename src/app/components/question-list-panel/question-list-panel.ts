@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@a
 import { QuestionStore } from '../../core/question-store.service';
 import { Question } from '../../core/question.model';
 
-type Tab = 'answered' | 'all' | 'archived';
+type Tab = 'pending' | 'answered' | 'archived';
 
 @Component({
   selector: 'app-question-list-panel',
@@ -12,67 +12,91 @@ type Tab = 'answered' | 'all' | 'archived';
 })
 export class QuestionListPanel {
   protected readonly store = inject(QuestionStore);
-  protected readonly activeTab = signal<Tab>('answered');
+  protected readonly activeTab = signal<Tab>('pending');
   protected readonly selectedTag = signal('');
+  protected readonly selectedIds = signal<Set<string>>(new Set());
 
   protected readonly filteredAnswered = computed(() =>
     this.byTag(this.store.answeredQuestions()),
   );
-  protected readonly filteredAll = computed(() => this.byTag(this.store.allQuestionsList()));
+  protected readonly filteredPending = computed(() =>
+    this.byTag(this.store.pendingQuestions()),
+  );
   protected readonly filteredArchived = computed(() =>
     this.byTag(this.store.archivedQuestions()),
   );
 
+  protected readonly currentList = computed<Question[]>(() => {
+    switch (this.activeTab()) {
+      case 'pending':
+        return this.filteredPending();
+      case 'answered':
+        return this.filteredAnswered();
+      case 'archived':
+        return this.filteredArchived();
+    }
+  });
+
+  protected readonly allSelected = computed(() => {
+    const list = this.currentList();
+    return list.length > 0 && list.every((q) => this.selectedIds().has(q.id));
+  });
+
+  protected setTab(tab: Tab): void {
+    this.activeTab.set(tab);
+    this.selectedIds.set(new Set());
+  }
+
   protected onTagChange(event: Event): void {
     this.selectedTag.set((event.target as HTMLSelectElement).value);
+    this.selectedIds.set(new Set());
   }
 
-  protected deleteQuestion(id: string, text: string): void {
-    if (confirm(`Видалити питання "${text}"? Дію не можна скасувати (окрім повторного імпорту).`)) {
-      this.store.deleteQuestion(id);
-    }
+  protected toggleSelect(id: string): void {
+    const next = new Set(this.selectedIds());
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    this.selectedIds.set(next);
   }
 
-  protected deleteAll(): void {
-    const list = this.filteredAll();
-    if (list.length === 0) return;
-    if (!this.selectedTag()) {
-      if (confirm('Видалити ВСІ питання без винятку? Дію не можна скасувати.')) {
-        this.store.deleteAllQuestions();
-      }
-      return;
-    }
-    if (
-      confirm(
-        `Видалити ${list.length} питання(нь) з тегом "${this.selectedTag()}"? Дію не можна скасувати.`,
-      )
-    ) {
-      for (const q of list) {
-        this.store.deleteQuestion(q.id);
-      }
+  protected toggleSelectAll(): void {
+    if (this.allSelected()) {
+      this.selectedIds.set(new Set());
+    } else {
+      this.selectedIds.set(new Set(this.currentList().map((q) => q.id)));
     }
   }
 
-  protected resetAllAnswered(): void {
-    const list = this.filteredAnswered();
-    if (list.length === 0) return;
-    if (!this.selectedTag()) {
-      this.store.resetAllAnswered();
-      return;
-    }
-    for (const q of list) {
-      this.store.returnToPool(q.id);
+  protected deleteSelected(): void {
+    const ids = [...this.selectedIds()];
+    if (ids.length === 0) return;
+    if (confirm(`Delete ${ids.length} question(s)? This can't be undone.`)) {
+      for (const id of ids) this.store.deleteQuestion(id);
+      this.selectedIds.set(new Set());
     }
   }
 
-  protected archiveAllAnswered(): void {
-    const list = this.filteredAnswered();
-    if (list.length === 0) return;
-    if (confirm(`Архівувати ${list.length} питання(нь)?`)) {
-      for (const q of list) {
-        this.store.archiveQuestion(q.id);
-      }
+  protected archiveSelected(): void {
+    const ids = [...this.selectedIds()];
+    if (ids.length === 0) return;
+    if (confirm(`Archive ${ids.length} question(s)?`)) {
+      for (const id of ids) this.store.archiveQuestion(id);
+      this.selectedIds.set(new Set());
     }
+  }
+
+  protected resetSelected(): void {
+    const ids = [...this.selectedIds()];
+    if (ids.length === 0) return;
+    for (const id of ids) this.store.returnToPool(id);
+    this.selectedIds.set(new Set());
+  }
+
+  protected restoreSelected(): void {
+    const ids = [...this.selectedIds()];
+    if (ids.length === 0) return;
+    for (const id of ids) this.store.restoreFromArchive(id);
+    this.selectedIds.set(new Set());
   }
 
   private byTag(list: Question[]): Question[] {

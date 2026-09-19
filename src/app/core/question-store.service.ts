@@ -61,15 +61,17 @@ export class QuestionStore {
     return [...tags].sort();
   });
 
-  readonly filteredPool = computed(() => {
-    const selected = this.selectedTags();
+  /** Questions not yet answered and not archived — the pool the next random pick is drawn from. */
+  readonly pendingQuestions = computed(() => {
     const answered = this.answeredIds();
     const archived = this.archivedIds();
-    return this.allQuestions().filter(
-      (q) =>
-        !answered.has(q.id) &&
-        !archived.has(q.id) &&
-        (selected.size === 0 || q.tags.some((t) => selected.has(t))),
+    return this.allQuestions().filter((q) => !answered.has(q.id) && !archived.has(q.id));
+  });
+
+  readonly filteredPool = computed(() => {
+    const selected = this.selectedTags();
+    return this.pendingQuestions().filter(
+      (q) => selected.size === 0 || q.tags.some((t) => selected.has(t)),
     );
   });
 
@@ -124,7 +126,7 @@ export class QuestionStore {
       this.allQuestions.set(normalize(raw));
     } catch (err) {
       this.loadError.set(
-        'Не вдалось завантажити questions.json. Імпортуйте свій файл.',
+        'Could not load questions.json. Import your own file instead.',
       );
     } finally {
       this.loading.set(false);
@@ -134,10 +136,10 @@ export class QuestionStore {
   /** Merges imported questions into the existing pool (does not replace it). */
   importFromRaw(raw: RawQuestion[]): { ok: boolean; error?: string; added?: number } {
     if (!Array.isArray(raw) || raw.length === 0) {
-      return { ok: false, error: 'Очікується непорожній масив питань.' };
+      return { ok: false, error: 'Expected a non-empty array of questions.' };
     }
     if (raw.some((q) => typeof q?.text !== 'string' || !q.text.trim())) {
-      return { ok: false, error: 'Кожне питання повинно мати поле "text".' };
+      return { ok: false, error: 'Every question must have a "text" field.' };
     }
     const incoming = normalize(raw, `import-${Date.now()}`);
     const existingIds = new Set(this.allQuestions().map((q) => q.id));
@@ -155,7 +157,7 @@ export class QuestionStore {
 
   addQuestion(raw: RawQuestion): { ok: boolean; error?: string } {
     if (!raw.text || !raw.text.trim()) {
-      return { ok: false, error: "Текст питання обов'язковий." };
+      return { ok: false, error: 'Question text is required.' };
     }
     const [normalized] = normalize([raw], `manual-${Date.now()}`);
     const existingIds = new Set(this.allQuestions().map((q) => q.id));
@@ -199,13 +201,21 @@ export class QuestionStore {
     this.revealedFollowUpCount.update((n) => Math.min(n + 1, max));
   }
 
-  markCurrentAnswered(): void {
-    const id = this.currentQuestionId();
-    if (!id) return;
+  markAnswered(id: string): void {
     this.answeredIds.update((set) => new Set(set).add(id));
+  }
+
+  advanceToNextQuestion(): void {
     this.currentQuestionId.set(null);
     this.revealedFollowUpCount.set(0);
     this.pickRandom();
+  }
+
+  markCurrentAnswered(): void {
+    const id = this.currentQuestionId();
+    if (!id) return;
+    this.markAnswered(id);
+    this.advanceToNextQuestion();
   }
 
   returnToPool(id: string): void {
@@ -218,10 +228,6 @@ export class QuestionStore {
 
   resetAllAnswered(): void {
     this.answeredIds.set(new Set());
-  }
-
-  isAnswered(id: string): boolean {
-    return this.answeredIds().has(id);
   }
 
   isArchived(id: string): boolean {
@@ -267,14 +273,5 @@ export class QuestionStore {
       this.revealedFollowUpCount.set(0);
     }
     this.persistAsCustom(remaining);
-  }
-
-  deleteAllQuestions(): void {
-    this.allQuestions.set([]);
-    this.answeredIds.set(new Set());
-    this.archivedIds.set(new Set());
-    this.currentQuestionId.set(null);
-    this.revealedFollowUpCount.set(0);
-    this.persistAsCustom([]);
   }
 }
