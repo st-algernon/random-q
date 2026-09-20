@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { QuestionStore } from '../../core/question-store.service';
+import { DialogState } from '../../core/dialog-state.service';
 import { AddQuestionDialog } from '../add-question-dialog/add-question-dialog';
 
 @Component({
@@ -11,4 +12,5 @@ import { AddQuestionDialog } from '../add-question-dialog/add-question-dialog';
 })
 export class Toolbar {
   protected readonly store = inject(QuestionStore);
+  protected readonly dialogState = inject(DialogState);
 }

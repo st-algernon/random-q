@@ -203,6 +203,7 @@
   color: var(--muted);
   font-size: 0.8rem;
   white-space: nowrap;
+  flex-shrink: 0;
   padding: 0.2rem 0;
 
   &:hover {

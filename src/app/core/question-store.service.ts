@@ -168,6 +168,17 @@ export class QuestionStore {
     return { ok: true };
   }
 
+  updateQuestion(id: string, raw: RawQuestion): { ok: boolean; error?: string } {
+    if (!raw.text || !raw.text.trim()) {
+      return { ok: false, error: 'Question text is required.' };
+    }
+    const [normalized] = normalize([{ ...raw, id }]);
+    const merged = this.allQuestions().map((q) => (q.id === id ? normalized : q));
+    this.allQuestions.set(merged);
+    this.persistAsCustom(merged);
+    return { ok: true };
+  }
+
   private persistAsCustom(list: Question[]): void {
     writeLocalStorage(CUSTOM_QUESTIONS_KEY, list);
   }

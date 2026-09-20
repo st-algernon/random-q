@@ -1,6 +1,6 @@
 <div class="toolbar">
-  <button type="button" class="btn" (click)="dialog.openDialog()">+ add</button>
+  <button type="button" class="btn" (click)="dialogState.openForCreate()">+ add</button>
   <span class="toolbar__stats">{{ store.answeredCount() }} / {{ store.totalCount() }}</span>
 </div>
 
-<app-add-question-dialog #dialog />
+<app-add-question-dialog />

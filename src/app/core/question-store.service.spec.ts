@@ -111,4 +111,25 @@ describe('QuestionStore', () => {
     const added = store.allQuestionsList().find((q) => q.text === 'Питання з тегами');
     expect(added?.tags).toEqual(['angular', 'rxjs']);
   });
+
+  it('updateQuestion edits the text and tags while keeping the same id', () => {
+    const [first] = mockQuestions;
+
+    const result = store.updateQuestion(first.id, {
+      text: 'Updated text',
+      tags: ['updated'],
+    });
+
+    expect(result.ok).toBe(true);
+    const updated = store.allQuestionsList().find((q) => q.id === first.id);
+    expect(updated?.text).toBe('Updated text');
+    expect(updated?.tags).toEqual(['updated']);
+    expect(store.totalCount()).toBe(mockQuestions.length);
+  });
+
+  it('updateQuestion rejects an empty text', () => {
+    const [first] = mockQuestions;
+    const result = store.updateQuestion(first.id, { text: '' });
+    expect(result.ok).toBe(false);
+  });
 });

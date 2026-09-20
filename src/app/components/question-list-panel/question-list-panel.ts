@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { QuestionStore } from '../../core/question-store.service';
+import { DialogState } from '../../core/dialog-state.service';
 import { Question } from '../../core/question.model';
 
 type Tab = 'pending' | 'answered' | 'archived';
@@ -12,6 +13,7 @@ type Tab = 'pending' | 'answered' | 'archived';
 })
 export class QuestionListPanel {
   protected readonly store = inject(QuestionStore);
+  protected readonly dialogState = inject(DialogState);
   protected readonly activeTab = signal<Tab>('pending');
   protected readonly selectedTag = signal('');
   protected readonly selectedIds = signal<Set<string>>(new Set());
@@ -65,6 +67,22 @@ export class QuestionListPanel {
     } else {
       this.selectedIds.set(new Set(this.currentList().map((q) => q.id)));
     }
+  }
+
+  protected editSelected(): void {
+    const ids = [...this.selectedIds()];
+    if (ids.length !== 1) return;
+    const [id] = ids;
+    const question = this.currentList().find((q) => q.id === id);
+    if (!question) return;
+    this.dialogState.openForEdit(question, () => {
+      this.selectedIds.update((set) => {
+        if (!set.has(id)) return set;
+        const next = new Set(set);
+        next.delete(id);
+        return next;
+      });
+    });
   }
 
   protected deleteSelected(): void {

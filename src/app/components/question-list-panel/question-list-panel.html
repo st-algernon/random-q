@@ -41,6 +41,14 @@
           <button
             type="button"
             class="link"
+            [disabled]="selectedIds().size !== 1"
+            (click)="editSelected()"
+          >
+            ✎ edit
+          </button>
+          <button
+            type="button"
+            class="link"
             [disabled]="selectedIds().size === 0"
             (click)="deleteSelected()"
           >

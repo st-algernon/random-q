@@ -1,9 +1,8 @@
-import { ChangeDetectionStrategy, Component, HostListener, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { QuestionStore } from '../../core/question-store.service';
+import { DialogState } from '../../core/dialog-state.service';
 import { RawQuestion } from '../../core/question.model';
-
-type Mode = 'manual' | 'import';
 
 @Component({
   selector: 'app-add-question-dialog',
@@ -14,9 +13,8 @@ type Mode = 'manual' | 'import';
 })
 export class AddQuestionDialog {
   private readonly store = inject(QuestionStore);
+  protected readonly dialogState = inject(DialogState);
 
-  protected readonly open = signal(false);
-  protected readonly mode = signal<Mode>('manual');
   protected readonly error = signal<string | null>(null);
   protected readonly notice = signal<string | null>(null);
 
@@ -24,26 +22,21 @@ export class AddQuestionDialog {
   protected readonly tagsInput = signal('');
   protected readonly followUps = signal<string[]>([]);
 
-  openDialog(): void {
-    this.open.set(true);
-    this.mode.set('manual');
-    this.error.set(null);
-    this.notice.set(null);
-  }
-
-  closeDialog(): void {
-    this.open.set(false);
+  constructor() {
+    effect(() => {
+      if (!this.dialogState.open()) return;
+      const editing = this.dialogState.editingQuestion();
+      this.error.set(null);
+      this.notice.set(null);
+      this.text.set(editing?.text ?? '');
+      this.tagsInput.set(editing?.tags.join(', ') ?? '');
+      this.followUps.set(editing?.followUps ? [...editing.followUps] : []);
+    });
   }
 
   @HostListener('document:keydown.escape')
   protected onEscape(): void {
-    if (this.open()) this.closeDialog();
-  }
-
-  protected setMode(mode: Mode): void {
-    this.mode.set(mode);
-    this.error.set(null);
-    this.notice.set(null);
+    if (this.dialogState.open()) this.dialogState.close();
   }
 
   protected addFollowUp(): void {
@@ -67,6 +60,20 @@ export class AddQuestionDialog {
         .filter(Boolean),
       followUps: this.followUps().filter((f) => f.trim().length > 0),
     };
+
+    const editing = this.dialogState.editingQuestion();
+    if (editing) {
+      const result = this.store.updateQuestion(editing.id, raw);
+      if (!result.ok) {
+        this.error.set(result.error ?? 'Could not save the question.');
+        return;
+      }
+      this.error.set(null);
+      this.dialogState.notifySaved();
+      this.dialogState.close();
+      return;
+    }
+
     const result = this.store.addQuestion(raw);
     if (!result.ok) {
       this.error.set(result.error ?? 'Could not add the question.');
@@ -94,7 +101,7 @@ export class AddQuestionDialog {
       }
       this.error.set(null);
       this.notice.set(`✓ added ${result.added} question(s)`);
-      setTimeout(() => this.closeDialog(), 700);
+      setTimeout(() => this.dialogState.close(), 700);
     } catch {
       this.error.set('Invalid JSON file.');
     } finally {

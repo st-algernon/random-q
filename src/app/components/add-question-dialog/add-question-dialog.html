@@ -1,29 +1,33 @@
-@if (open()) {
-  <div class="overlay" (click)="closeDialog()">
+@if (dialogState.open()) {
+  <div class="overlay" (click)="dialogState.close()">
     <div class="dialog" (click)="$event.stopPropagation()">
       <div class="dialog__header">
         <div class="dialog__tabs">
           <button
             type="button"
             class="tab"
-            [class.tab--active]="mode() === 'manual'"
-            (click)="setMode('manual')"
+            [class.tab--active]="dialogState.mode() === 'manual'"
+            (click)="dialogState.mode.set('manual')"
           >
-            new question
+            {{ dialogState.editingQuestion() ? 'edit question' : 'new question' }}
           </button>
-          <button
-            type="button"
-            class="tab"
-            [class.tab--active]="mode() === 'import'"
-            (click)="setMode('import')"
-          >
-            import json
-          </button>
+          @if (!dialogState.editingQuestion()) {
+            <button
+              type="button"
+              class="tab"
+              [class.tab--active]="dialogState.mode() === 'import'"
+              (click)="dialogState.mode.set('import')"
+            >
+              import json
+            </button>
+          }
         </div>
-        <button type="button" class="close" title="close" (click)="closeDialog()">✕</button>
+        <button type="button" class="close" title="close" (click)="dialogState.close()">
+          ✕
+        </button>
       </div>
 
-      @if (mode() === 'manual') {
+      @if (dialogState.mode() === 'manual') {
         <form class="form" (ngSubmit)="submitManual()">
           <label class="field">
             <span class="field__label">question *</span>
@@ -83,7 +87,9 @@
           }
 
           <div class="dialog__actions">
-            <button type="submit" class="btn btn--primary">+ add question</button>
+            <button type="submit" class="btn btn--primary">
+              {{ dialogState.editingQuestion() ? '✓ save' : '+ add question' }}
+            </button>
           </div>
         </form>
       } @else {
